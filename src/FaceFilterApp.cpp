@@ -7,7 +7,7 @@
 //
 
 #include <QApplication>
-#include "CameraPreview.h"
+#include "src/CameraPreview.h"
 
 int main(int argc, char *argv[]) {
     
@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
     
     cameraPreview.setStyleSheet("QMainWindow {background-color: #000000;}");
     
+    cameraPreview.resizeWindowWithFrame(1.2);
+        
     cameraPreview.show();
     
     return application.exec();

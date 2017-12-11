@@ -5,6 +5,8 @@
 #include <QImage>
 #include <QPixmap>
 #include <QTimer>
+#include <QFontDatabase>
+#include <ctime>
 #include <opencv2/opencv.hpp>
 
 namespace Ui {
@@ -18,6 +20,8 @@ class CameraPreview : public QMainWindow
 public:
     explicit CameraPreview(QWidget *parent = 0);
     ~CameraPreview();
+    
+    void resizeWindowWithFrame(const double&);
 
 private:
     

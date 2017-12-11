@@ -3,10 +3,11 @@ cmake_minimum_required(VERSION 2.8)
 project (FaceFilters)
 
 set(CMAKE_PREFIX_PATH "/usr/local/Cellar/qt/5.9.1/lib/cmake/Qt5")
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(OpenCV REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
-
+find_package(dlib REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -29,6 +30,6 @@ ${SRC_FILES}
 ${HDR_FILES}
 ${UI_FILES})
 
-target_link_libraries(FaceFilterApp ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets)
+target_link_libraries(FaceFilterApp ${OpenCV_LIBS} dlib::dlib Qt5::Core Qt5::Gui Qt5::Widgets)
 
 
