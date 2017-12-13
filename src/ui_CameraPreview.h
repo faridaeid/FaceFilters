@@ -88,18 +88,18 @@ public:
         filterButtonThree->setSizePolicy(sizePolicyButton);
 
         verticalLayout->addWidget(filterButtonThree);
-
-        filterButtonFour = new QPushButton(horizontalLayoutWidget);
-        filterButtonFour->setObjectName(QStringLiteral("filterButtonFour"));
-        filterButtonFour->setSizePolicy(sizePolicyButton);
-
-        verticalLayout->addWidget(filterButtonFour);
-
-        filterButtonFive = new QPushButton(horizontalLayoutWidget);
-        filterButtonFive->setObjectName(QStringLiteral("filterButtonFive"));
-        filterButtonFive->setSizePolicy(sizePolicyButton);
-
-        verticalLayout->addWidget(filterButtonFive);
+////
+//        filterButtonFour = new QPushButton(horizontalLayoutWidget);
+//        filterButtonFour->setObjectName(QStringLiteral("filterButtonFour"));
+//        filterButtonFour->setSizePolicy(sizePolicyButton);
+//
+//        verticalLayout->addWidget(filterButtonFour);
+//
+//        filterButtonFive = new QPushButton(horizontalLayoutWidget);
+//        filterButtonFive->setObjectName(QStringLiteral("filterButtonFive"));
+//        filterButtonFive->setSizePolicy(sizePolicyButton);
+//
+//        verticalLayout->addWidget(filterButtonFive);
         
         captureButton = new QPushButton(horizontalLayoutWidget);
         captureButton->setObjectName(QStringLiteral("captureButton"));
@@ -131,8 +131,8 @@ public:
         filterButtonOne->setText(QApplication::translate("CameraPreview", "Filter 1", Q_NULLPTR));
         filterButtonTwo->setText(QApplication::translate("CameraPreview", "Filter 2", Q_NULLPTR));
         filterButtonThree->setText(QApplication::translate("CameraPreview", "Filter 3", Q_NULLPTR));
-        filterButtonFour->setText(QApplication::translate("CameraPreview", "Filter 4", Q_NULLPTR));
-        filterButtonFive->setText(QApplication::translate("CameraPreview", "Filter 5", Q_NULLPTR));
+//        filterButtonFour->setText(QApplication::translate("CameraPreview", "Filter 4", Q_NULLPTR));
+//        filterButtonFive->setText(QApplication::translate("CameraPreview", "Filter 5", Q_NULLPTR));
         captureButton->setText(QApplication::translate("CameraPreview", "", Q_NULLPTR));
 
     } // retranslateUi
