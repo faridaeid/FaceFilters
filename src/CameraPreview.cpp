@@ -123,9 +123,9 @@ void CameraPreview::detectFaces() {
     
     std::vector<dlib::rectangle> detections = frontalFaceDetector(detectionImageDlib);
     
-    if (detections.size()) {       // only detects one face
+    for (int i = 0; i < detections.size(); i++) {       // only detects one face
         
-        dlib::full_object_detection faceLandmark = shapePredictor(detectionImageDlib, detections[0]);
+        dlib::full_object_detection faceLandmark = shapePredictor(detectionImageDlib, detections[i]);
         
         switch (currentFilter) {
                 
