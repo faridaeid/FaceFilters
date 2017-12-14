@@ -16,7 +16,7 @@ enum FilterSelected {
     
     NoFilter,
     MoustacheFilter,
-    DogFilter,
+    FlowerFilter,
     HarryPotterFilter    
 };
 
@@ -40,8 +40,8 @@ private:
     cv::VideoCapture videoCapture;
     cv::Mat frame;
     cv::Mat moustacheImage;
-    cv::Mat dogImages[3];
     cv::Mat harryPotterImage[2];
+    cv::Mat flowerImage;
     QTimer * frameTimer;
     dlib::frontal_face_detector frontalFaceDetector;
     dlib::shape_predictor shapePredictor;
@@ -52,13 +52,14 @@ private:
     void startWebcam();
     void detectFaces();
     void captureImage();
+    void stopFilters();
     void assignFilterSelected();
+    void overlayFilter(const cv::Mat&, const cv::Mat&, cv::Mat&, cv::Point);
     
     void addFilterOne(const dlib::full_object_detection&);
     void addFilterTwo(const dlib::full_object_detection&);
     void addFilterThree(const dlib::full_object_detection&);
-    void addFilterFour(const dlib::full_object_detection&);
-    void addFilterFive(const dlib::full_object_detection&);
+    
     
 };
 

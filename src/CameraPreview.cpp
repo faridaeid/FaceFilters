@@ -10,9 +10,9 @@ CameraPreview::CameraPreview(QWidget *parent) :
     connect(ui->filterButtonOne, &QPushButton::clicked, this, &CameraPreview::assignFilterSelected);
     connect(ui->filterButtonTwo, &QPushButton::clicked, this, &CameraPreview::assignFilterSelected);
     connect(ui->filterButtonThree, &QPushButton::clicked, this, &CameraPreview::assignFilterSelected);
-//    connect(ui->filterButtonFour, &QPushButton::clicked, this, &CameraPreview::assignFilterSelected);
-//    connect(ui->filterButtonFive, &QPushButton::clicked, this, &CameraPreview::assignFilterSelected);
     connect(ui->captureButton, &QPushButton::clicked, this, &CameraPreview::captureImage);
+    connect(ui->closeButton, &QPushButton::clicked, this, &CameraPreview::stopFilters);
+
 
     
     QString pushButtonStyleSheet = "QPushButton {color: #ffffff;"
@@ -31,19 +31,21 @@ CameraPreview::CameraPreview(QWidget *parent) :
     ui->filterButtonOne->setStyleSheet(pushButtonStyleSheet);
     ui->filterButtonTwo->setStyleSheet(pushButtonStyleSheet);
     ui->filterButtonThree->setStyleSheet(pushButtonStyleSheet);
-//    ui->filterButtonFour->setStyleSheet(pushButtonStyleSheet);
-//    ui->filterButtonFive->setStyleSheet(pushButtonStyleSheet);
     ui->captureButton->setStyleSheet(captureButtonStyleSheet);
+    ui->closeButton->setStyleSheet(captureButtonStyleSheet);
+
     
-    ui->filterButtonOne->setText("Moustahce");
-    ui->filterButtonTwo->setText("Dog");
-    ui->filterButtonThree->setText("Harry Potter");
-//    ui->filterButtonFour->setText("Rainbow");
-//    ui->filterButtonFive->setText("Cat");
-    
+    ui->filterButtonOne->setText("MOUSTACHE");
+    ui->filterButtonTwo->setText("FLOWER");
+    ui->filterButtonThree->setText("HARRY POTTER");
+
     QIcon icon("Styling/captureImage2.png");
     ui->captureButton->setIcon(icon);
     ui->captureButton->setIconSize(QSize(80, 60));
+    
+    QIcon icon2("Styling/closeImage.png");
+    ui->closeButton->setIcon(icon2);
+    ui->closeButton->setIconSize(QSize(40, 40));
     
     frontalFaceDetector = dlib::get_frontal_face_detector();
     
@@ -83,7 +85,7 @@ void CameraPreview::resizeWindowWithFrame(const double& ratio) {
     
     this->resize(newWidth, newHeight);
     
-    ui->horizontalLayoutWidget->setGeometry(QRect(5, 5, newWidth - 15, newHeight - 35));
+    ui->horizontalLayoutWidget->setGeometry(QRect(5, 5, newWidth - 20, newHeight - 35));
         
 }
 
@@ -125,12 +127,6 @@ void CameraPreview::detectFaces() {
         
         dlib::full_object_detection faceLandmark = shapePredictor(detectionImageDlib, detections[0]);
         
-        for (int j = 0; j < faceLandmark.num_parts(); j++) {
-            
-            cv::circle(frame, cv::Point(faceLandmark.part(j).x() * 4, faceLandmark.part(j).y() * 4) , 2, cv::Scalar(255,0,0), 2);
-            
-        }
-        
         switch (currentFilter) {
                 
             case MoustacheFilter:
@@ -139,6 +135,10 @@ void CameraPreview::detectFaces() {
                 
             case HarryPotterFilter:
                 addFilterTwo(faceLandmark);
+                break;
+                
+            case FlowerFilter:
+                addFilterThree(faceLandmark);
                 break;
                 
             default:
@@ -184,7 +184,7 @@ void CameraPreview::assignFilterSelected() {
         
     } else if (buttonSelected == ui->filterButtonTwo) {
         
-        currentFilter = DogFilter;
+        currentFilter = FlowerFilter;
         
     } else  if (buttonSelected == ui->filterButtonThree) {
         
@@ -192,19 +192,52 @@ void CameraPreview::assignFilterSelected() {
     }
 }
 
+
+void CameraPreview::overlayFilter(const cv::Mat& background,
+                                  const cv::Mat& foreground,
+                                  cv::Mat& output,
+                                  cv::Point upperLeftCorner) {
+    
+    background.copyTo(output);
+    
+    
+    for (int y = 0; y < foreground.rows; y++) {
+        
+        for (int x = 0; x < foreground.cols; x++) {
+            
+            double opacity = ((double)foreground.data[y * foreground.step + x * foreground.channels() + 3]) / 255.;
+            
+            int offsetx = x + upperLeftCorner.x;
+            int offsety = y + upperLeftCorner.y;
+            
+            if (opacity > 0) {
+                
+                for (int channel = 0; channel < output.channels(); channel++) {
+                    
+                    unsigned char foregroundPixel = foreground.data[y * foreground.step + x * foreground.channels() + channel];
+                    
+                    unsigned char backgroundPixel = background.data[offsety * background.step + offsetx * background.channels() + channel];
+                    
+                    output.data[offsety * output.step + offsetx * output.channels() + channel] =
+                    backgroundPixel * (1.0 - opacity) + foregroundPixel * opacity;
+                    
+                }
+            }
+        }
+    }
+}
+
 void CameraPreview::addFilterOne(const dlib::full_object_detection& faceLandmark) {
     
-    int x = faceLandmark.part(49).x() * 4;
-    int y = faceLandmark.part(36).y() * 4;
+    int x = faceLandmark.part(48).x() * 4;
+    int y = faceLandmark.part(33).y() * 4;
     
     if (loadAndResizeFilter) {
         
-        moustacheImage = cv::imread("Filters/moustache.png");
+        moustacheImage = cv::imread("Filters/moustache.png", cv::IMREAD_UNCHANGED);
         
-        int x = faceLandmark.part(55).x();
-        
-        int imageLength = (faceLandmark.part(55).x() - faceLandmark.part(49).x()) * 4;
-        int imageHeight = (faceLandmark.part(63).y() - faceLandmark.part(36).y()) * 4;
+        int imageLength = (faceLandmark.part(54).x() - faceLandmark.part(48).x()) * 4;
+        int imageHeight = (faceLandmark.part(51).y() - faceLandmark.part(33).y()) * 4;
         
         cv::resize(moustacheImage, moustacheImage, cv::Size(imageLength, imageHeight));
         
@@ -212,25 +245,67 @@ void CameraPreview::addFilterOne(const dlib::full_object_detection& faceLandmark
     
     }
     
-    moustacheImage.copyTo(frame(cv::Rect(x, y, moustacheImage.cols, moustacheImage.rows)));
+    overlayFilter(frame, moustacheImage, frame, cv::Point(x,y));
 
 }
 
 void CameraPreview::addFilterTwo(const dlib::full_object_detection& faceLandmark) {
     
+    int x0 = faceLandmark.part(0).x() * 4;
+    int y0 = faceLandmark.part(21).y() * 4;
+    
+    int x1 = faceLandmark.part(22).x() * 4;
+    int y1 = faceLandmark.part(24).y() * 4 - 40;
+    
+    if (loadAndResizeFilter) {
+        
+        harryPotterImage[0] = cv::imread("Filters/glasses.png", cv::IMREAD_UNCHANGED);
+        harryPotterImage[1] = cv::imread("Filters/scar.png", cv::IMREAD_UNCHANGED);
+        
+        int imageLength0 = (faceLandmark.part(16).x() - faceLandmark.part(0).x()) * 4;
+        int imageHeight0 = (faceLandmark.part(30).y() - faceLandmark.part(21).y()) * 4;
+        int imageLength1 = (faceLandmark.part(20).x() - faceLandmark.part(17).x()) * 4;
+        int imageHeight1 = 50;
+
+        cv::resize(harryPotterImage[0], harryPotterImage[0], cv::Size(imageLength0, imageHeight0));
+        cv::resize(harryPotterImage[1], harryPotterImage[1], cv::Size(imageLength1, imageHeight1));
+        
+        loadAndResizeFilter = false;
+        
+    }
+    
+    overlayFilter(frame, harryPotterImage[0], frame, cv::Point(x0,y0));
+    overlayFilter(frame, harryPotterImage[1], frame, cv::Point(x1,y1));
+
+    
 }
 
 void CameraPreview::addFilterThree(const dlib::full_object_detection& faceLandmark) {
     
+    int x = faceLandmark.part(0).x() * 4;
+    int y = faceLandmark.part(20 ).y() * 4 - 100;
+    
+    if (loadAndResizeFilter) {
+        
+        flowerImage = cv::imread("Filters/flowers.png", cv::IMREAD_UNCHANGED);
+        
+        int imageLength = (faceLandmark.part(16).x() - faceLandmark.part(0).x()) * 4;
+        int imageHeight = 100;
+        
+        cv::resize(flowerImage, flowerImage, cv::Size(imageLength, imageHeight));
+        
+        loadAndResizeFilter = false;
+        
+    }
+    
+    overlayFilter(frame, flowerImage, frame, cv::Point(x,y));
+    
     
 }
 
-void CameraPreview::addFilterFour(const dlib::full_object_detection& faceLandmark) {
+void CameraPreview::stopFilters() {
+    
+    currentFilter = NoFilter;
     
 }
-
-void CameraPreview::addFilterFive(const dlib::full_object_detection& faceLandmark) {
-    
-}
-
 

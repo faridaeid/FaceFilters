@@ -39,6 +39,7 @@ public:
     QPushButton *filterButtonFour;
     QPushButton *filterButtonFive;
     QPushButton *captureButton;
+    QPushButton * closeButton;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -67,10 +68,18 @@ public:
         
         QSizePolicy sizePolicyButton(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicyButton.setVerticalStretch(1);
-//        sizePolicyButton.setHeightForWidth(webcamPreview->sizePolicy().hasHeightForWidth());
+    
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        
+        closeButton = new QPushButton(horizontalLayoutWidget);
+        closeButton->setObjectName(QStringLiteral("closeButton"));
+        closeButton->setSizePolicy(sizePolicyButton);
+        
+        verticalLayout->addWidget(closeButton);
+        
+        
         filterButtonOne = new QPushButton(horizontalLayoutWidget);
         filterButtonOne->setObjectName(QStringLiteral("filterButtonOne"));
         filterButtonOne->setSizePolicy(sizePolicyButton);
@@ -101,13 +110,13 @@ public:
 //
 //        verticalLayout->addWidget(filterButtonFive);
         
+        
         captureButton = new QPushButton(horizontalLayoutWidget);
         captureButton->setObjectName(QStringLiteral("captureButton"));
         captureButton->setSizePolicy(sizePolicyButton);
         
         verticalLayout->addWidget(captureButton);
-
-
+    
         horizontalLayout->addLayout(verticalLayout);
 
         CameraPreview->setCentralWidget(centralwidget);
@@ -134,6 +143,8 @@ public:
 //        filterButtonFour->setText(QApplication::translate("CameraPreview", "Filter 4", Q_NULLPTR));
 //        filterButtonFive->setText(QApplication::translate("CameraPreview", "Filter 5", Q_NULLPTR));
         captureButton->setText(QApplication::translate("CameraPreview", "", Q_NULLPTR));
+        closeButton->setText(QApplication::translate("CameraPreview", "", Q_NULLPTR));
+
 
     } // retranslateUi
 
